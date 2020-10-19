@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    span {
+        color: red;
+        font-weight: 400;
+    }
+    b {
+        color: red;
+    }
+    .box {
+        margin-left: 42px;
+    }
+</style>
+<body>
+    <h1>js基础</h1>
+    <h2>01.&nbsp;typeof可以识别所有值类型；识别函数；判断是否是引用类型（不可再细分）</h2>
+    <h2>02.&nbsp;引用类型的&nbsp;<span>浅拷贝</span>&nbsp;会改变原始的值，<span>深拷贝</span>&nbsp;不会改变原始的值</h2>
+    <h2>03.&nbsp;以下是falsely变量&nbsp;<span>!!0</span>，<span>!!NaN</span>，<span>!!''</span>，<span>!!null</span>，<span>!!undefined</span>，<span>!!false</span>，除此之外都是truely变量</h2>
+    <h2>04.&nbsp;<b>原型和原型链，class和继承，类型判断instanceof</b></h2>
+    <h2>05.&nbsp;<b>作用域，闭包，this</b>（ this 取什么值是在函数执行的时候确定的，不是在函数定义的时候确定的 ）</h2>
+    <h2>06.&nbsp;<b>异步和单线程</b></h2>
+    <h2>07.&nbsp;JS-Web-API-DOM</h2>
+       <div class="box">
+            <p class="box1"><b>property：</b>修改对象属性，不会体现到html结构中</p>
+            <p><b>attr：</b>修改html属性，会改变html的结构</p>
+            <p>两者都有可能引起DOM重新渲染，推荐使用property</p>
+       </div>
+    <h2>08.&nbsp;JS-Web-API-BOM&nbsp;&nbsp;<span>（ navigator浏览器，screen屏幕，location地址，history ）</span></h2>
+    <h2>09.&nbsp;JS-Web-API-事件&nbsp;&nbsp;&nbsp;<span>（ 事件绑定，事件冒泡，事件代理 ）</span></h2>
+    <h2>10.&nbsp;JS-Web-API-Ajax</h2>
+    <h2>11.&nbsp;JS-Web-API-存储</h2>
+</body>
+</html>
+<script>
+    console.log('typeof可以识别所有值类型；识别函数；判断是否是引用类型（不可再细分）')
+    /**
+     * 深拷贝
+     */
+     const obj1 = {
+         age: 20,
+         name: 'xxx',
+         address: {
+             city: 'xian'
+         },
+         arr: ['a', 'b', 'c']
+     }
+
+     const obj2 = obj1
+     const obj3 = deepClone(obj1)
+     obj2.address.city = 'shanghai'
+     obj3.address.city = 'guangdong'
+     obj3.arr[0] = 'a1'
+     console.log('最初obj1.address.city：xian')
+     console.log('浅拷贝——obj1.address.city：'+obj1.address.city+' 值已改变')
+     console.log('深拷贝——obj1.address.city：'+obj1.address.city+' 值未改变')
+     console.log('深拷贝——obj1.arr[0]：'+obj1.arr[0])
+     console.log('深拷贝——obj3.arr[0]：'+obj3.arr[0])
+    /**
+     * 深拷贝
+     */
+     function deepClone(obj = {}) {
+         if (typeof obj !== 'object' || obj == null) {
+             // obj 是null，或者不是对象和数组，直接返回
+             return obj
+         }
+         // 初始化返回结果
+         let result
+         if (obj instanceof Array) {
+             result = []
+        } else {
+            result = {}
+        }
+        for (let key in obj) {
+            // 保证 key 不是原型的属性
+            if (obj.hasOwnProperty(key)) {
+                // 递归调用 ！！！
+                result[key] = deepClone(obj[key])
+            }
+        }
+
+        return result
+     }
+     /**
+      * class
+      */
+     class Student {
+         constructor(name,number) {
+             this.name = name
+             this.number = number
+         }
+         sayHi() {
+             console.log(
+                 `姓名：${this.name}，学号：${this.number}`
+             )
+         }
+     }
+    //通过类 声明对象/实例
+    const xialuo = new Student('夏洛',1001)
+    console.log(xialuo.name)
+    console.log(xialuo.number)
+    xialuo.sayHi();
+    const madongmei = new Student('马冬梅',1002)
+    console.log(madongmei.name)
+    console.log(madongmei.number)
+    madongmei.sayHi();
+    // 继承
+    // 父类
+    class Animal {
+        constructor(name) {
+            this.name = name
+        }
+        eat() {
+            console.log(`${this.name}吃东西`)
+        }
+    }
+    //子类  通过 super 方法把属性传给父类
+    class Dog extends Animal {
+        constructor(name,skill) {
+            super(name) 
+            this.skill = skill
+        }
+        sayHi() {
+            console.log(`动物名称：${this.name}，它会${this.skill}`)
+        }
+    }
+    const dog = new Dog('狗','跑')
+    dog.sayHi()
+    dog.eat()
+    // 闭包使用场景：隐藏数据，
+    // 1.函数作为返回值
+    function creat() {
+        let a = 100
+        return function () {
+            console.log(a)
+        }
+    }
+    let fn = creat()
+    let a = 200
+    fn()   // 100
+    // 2.函数作为参数
+    function print(fn1) {
+        let b = 100
+        fn1()
+    }
+    let b = 200
+    function fnb() {
+      console.log(b)
+    }
+    print(fnb) // 200
+
+    // 所有的自由变量的查找，是在函数定义的地方，向上级作用域查找
+    // 不是在执行的地方
+
+    // this 取什么值是在函数执行的时候确定的，不是在函数定义的时候确定的
+    /**
+     * 作为普通函数
+     * 使用 call apply bind
+     * 作为对象方法被调用
+     * 在 class 方法中调用
+     * 箭头函数
+     */
+     function fThis() {
+         console.log(this)
+     }
+     fThis() // window
+     // call bind 可以改变 this 指向，bind 会返回一个新的函数
+     fThis.call({ x: 100 }) // {x: 100}
+     const fthis = fThis.bind({ x: 200 })
+     fthis() // {x: 200}
+
+     const zhangsan = {
+         name: 'zhangsan',
+         sayHi() {
+             // this 即当前对象
+             console.log(this)
+         },
+         wait() {
+             setTimeout(function() {
+                 // this === window
+                 console.log(this)
+             })
+         },
+         waitAgain() {
+             setTimeout(() => {
+                 // 箭头函数的 this 是取它上级作用域的this
+                 // this 即当前对象
+                 console.log(this)
+             })
+         }
+     }
+     zhangsan.sayHi() // {name: "zhangsan", sayHi: ƒ, wait: ƒ}
+     zhangsan.wait() // window
+     zhangsan.waitAgain() // {name: "zhangsan", sayHi: ƒ, wait: ƒ}
+     //DOM
+     const box1 = document.getElementsByClassName('box1')[0]
+     console.log( box1.parentNode ) //获取父节点
+     console.log( box1.childNodes)  //获取子节点 
+     //BOM   navigator浏览器  screen屏幕  location地址  history
+     const ua = navigator.userAgent
+     const isChrome = ua.indexOf('Chroma')
+     console.log(navigator.userAgent)
+     console.log(screen.width)
+     console.log(screen.height)
+     console.log(location.href)
+     console.log(location.protocol)
+    //  console.log(location.host)
+    //  console.log(location.search)
+
+    //  事件
+    
+</script>
